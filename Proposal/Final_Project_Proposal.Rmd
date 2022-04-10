@@ -1,0 +1,107 @@
+---
+title: "final_project"
+author: "Group 4 Yuka Chen, Jack Lo, Adela Yang"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document: null
+  latex_engine: xelatex
+always_allow_html: yes
+---
+```{r}
+library(tidyverse)
+library(broom)
+```
+
+# 1.  Problem Statement:  
+
+It pays to play in the National Basketball Association because of the high salary. NBA players are on average the highest-paid athletes in the world, according to Statista.com. The average salary in the NBA for the 2021-2022 season is 7.3 million. The top ten highest salaries in the NBA for the 2021-2022 season are all north of 39 million, including superstars Stephen Curry from the Golden State Warriors, the Brooklyn Nets’ Kevin Durant, and the Los Angeles Lakers LeBron James.
+
+Often time sports players would seem to have major contract with really high annual salary (some people would even think they should not get paid so much). 
+
+Since of one our group members is a super fan of basketball league, the National Basketball Association (NBA), in North America, he believes that those basketball players are paid by their season performance and they were not overpaid. However, other members in our group think otherwise. 
+
+Through this project, we want to find out whether these NBA players were overpaid, and do all of them have higher salary compared to previous contract they signed, or they salary were higher each year due to the inflation in the US dollar currency.
+
+For this project, we would try to create a prediction model for NBA player’s salary and help the players and NBA team to predict their annual salary by their seasonal performance, such as scoring, rebound, field goal percentage etc. 
+
+To clarify one point, not just high efficient scorers or all-star players get high paid, but also some role player in every team get high paid too. The reason is because there are lots of different and tough tasks need to be finished on court as well.
+For instance, the mission for a great point guard is high assist/turnover ratio and free throw percentage.
+Secondly, the mission for a great center is as much as rebounds he can grab and how many blocks he can reach.
+Thirdly, the mission for a great shooter is nearly 40 percentage of three-point.
+Last but not least, the mission for a great forward is how comprehensive his stats is.
+
+Purpose: 
+
+1. Discover which statistics are the best predictors of an NBA player’s salary
+
+2. Use a multiple regression model to predict NBA salaries
+
+3. Determine which players have been overvalued and undervalued according to their given vs. predicted salary
+
+Potential problems: The salary glowing may because inflation and increased business value due to globalization. 
+
+# 2.  Identify a data set that is relevant to your question: 
+
+The two dataset were collected from Basketball Reference (https://www.basketball-reference.com/) by Chris Davis (https://data.world/datadavis).
+
+The first dataset includes the information of NBA players backgroun information such as ID, Name, DOB, weights, heights, position, shoots etc, as well as their career performance.
+
+```{r}
+players <- read_csv("players.csv") ##Rmarkdown and dataset are saved in same folder
+## 24 variables and 4584 observations
+## 20 characters and 4 doubles variables
+#spec(players) #to check variable types
+#str(players) # to check variable structure
+names(players) #to check all variable names
+```
+
+The second dataset includes the playerID, team name, season periods (year) and their salaries the 1984-1985 season to the 2017-2018 season.
+```{r}
+salaries <- read_csv("salaries_1985to2018.csv") #same folder
+## 7 variables and 14163 observations
+## 4 characters and 3 double variables
+#spec(salaries) #to check variable types
+#str(salaries) # to check variable structure
+names(salaries) #to check all variable names
+```
+
+# 3.  Proposed Method of Analysis:  
+
+1. we would combine two dataset into one.
+
+2. data exploratory analysis for variables visualization and see if there are any potential linear relationship or outlinears for the models that we are interested
+
+3. to verify the linear relationship by t.test and other statistical information
+
+4. using simple linear relationship to create a model for predicting salaries
+
+5. using multiple linear relationship to see if there are other variables hae stronger relationship with salaries than the ones we expected
+
+6. stepwise regression to find the best fited prediction variables for our models
+
+7. visualization for our models
+
+# 4. Exploratory Data Analysis (Still Working On It):
+
+
+```{r}
+## combine two dataset
+NBA <- salaries %>%
+inner_join(players, by = c("player_id" = "_id"))
+```
+
+For all of the plots and text below, “year” will refer to the year that the season started. For example, year 2017 refers to the 2017-2018 season.
+
+```{r}
+salaries %>% group_by(season_start) %>%
+  count() %>%
+  ggplot(aes(season_start, n)) +
+  geom_col() +
+  labs(x = "Year", y = "the number of observations", 
+       title = "the number of observations by year")
+```
+
+It appears that the number of players is gradually increasing over time, which makes sense given the growing number of NBA clubs (albeit slowly). Some of the early years appear to be lacking data, while the year 2013 appears to be a little too low. We'll only look at salaries from 2000 to 2018 for the rest of this post. 

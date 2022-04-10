@@ -1,0 +1,137 @@
+---
+title: "Untitled"
+author: "Yuka Chen"
+date: "4/6/2022"
+output: html_document
+---
+```{r}
+
+library(nbastatR)
+library('nbastatR')
+library(tidyverse)
+
+##have to run Sys.setenv to increase the loading size
+##Sys.setenv("VROOM_CONNECTION_SIZE" = 131072 * 2)
+
+gamedata2017 <- game_logs(seasons = 2016:2017)
+##Sys.setenv("VROOM_CONNECTION_SIZE" = 131072 * 2)
+
+head(gamedata2017)
+```
+
+```{r}
+library(tidyverse)
+library(vroom)
+url <- "https://www.basketball-reference.com/leagues/NBA_2017_totals.html#totals_stats"
+vroom::vroom(url, delim = ",")
+
+performance <- read_delim("https://www.basketball-reference.com/leagues/NBA_2017_totals.html")
+vroom(vroom_example("mtcars.csv"), delim = ',')
+```
+
+
+```{r}
+library(rvest)
+library(readr)    # for type_convert
+
+adv <- "http://www.basketball-reference.com/leagues/NBA_2016.html?lid=header_seasons#all_misc_stats"
+
+h <- adv %>% read_html()    # be kind; don't rescrape unless necessary
+
+df <- h %>% 
+    html_nodes(xpath = '//comment()') %>%    # select comments
+    html_text() %>%    # extract comment text
+    paste(collapse = '') %>%    # collapse to single string
+    read_html() %>%    # reread as HTML
+    html_node('table#misc_stats') %>%    # select desired node
+    html_table() %>%    # parse node to table
+    { setNames(.[-1, ], paste0(names(.), .[1, ])) } %>%    # extract names from first row
+    type_convert()    # fix column types
+
+
+```
+```{r}
+gameUrl <- "http://www.basketball-reference.com/leagues/NBA_2016.html?lid=header_seasons#all_misc_stats"
+gameHtml <- gameUrl %>% read_html()
+#gameHtml %>% html_nodes("tbody")
+
+#Only save and work with the body
+body<-html_node(gameHtml,"body")
+write_xml(body, "nba.xml")
+
+#Find and remove comments
+lines<-readLines("nba.xml")
+lines<-lines[-grep("<!--", lines)]
+lines<-lines[-grep("-->", lines)]
+writeLines(lines, "nba2.xml")
+
+#Read the file back in and process normally
+body<-read_html("nba2.xml")
+
+#Table 10 was found by looking at all of tables and picking the one of interest
+tableofinterest<-(html_nodes(body, "tbody")[10])
+
+rows<-html_nodes(tableofinterest, "tr")
+tableOfResults<-t(sapply(rows, function(x) {html_text(html_nodes(x, "td"))}))
+#find titles from the frist record's attributes
+titles<-html_attrs(html_nodes(rows[1], "td"))
+dfnames<-unlist(titles)[seq(2, 2*length(titles), by=2)]
+
+#Final results are stored in data frame "df"
+df<-as.data.frame(tableOfResults)
+names(df)<-dfnames
+```
+
+
+```{r}
+hoops_hype_salary_summary()-> salary
+```
+
+```{r}
+hoopshype_salaries(all_teams = TRUE, nest_data = F, return_message = T) -> salary2
+```
+
+```{r}
+ nba_insider_salaries(assume_player_opt_out = T, assume_team_doesnt_exercise = T, return_message = TRUE) ->indi
+```
+```{r}
+nba_commonplayerinfo() -> c
+```
+
+```{r}
+plot1 <- ggplot(gamedata, aes(minutes,pts))+
+  geom_point()
+plot1
+```
+
+```{r}
+plot2 <-ggplot(gamedata, aes(minutes,pts))+
+  geom_line()+
+  geom_smooth(method = 'loess')+
+  facet_wrap(~nameTeam)
+plot2
+```
+
+```{r}
+summary(gamedata$pts)
+
+```
+
+```{r}
+# Points scored on histogram
+hist(gamedata$pts, breaks=50)
+```
+
+```{r}
+# Let's look at the top scorers and their playing time and their match outcome
+topscorer <- gamedata %>% 
+  select(namePlayer,pts,minutes,outcomeGame) %>% 
+  arrange(desc(pts))
+topscorer
+```
+
+```{r}
+#https://rpubs.com/thecodingone/nbastatRTutorial
+```
+
+
