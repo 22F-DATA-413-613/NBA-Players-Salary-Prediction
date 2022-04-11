@@ -34,12 +34,17 @@ NBAinfo <- performance16_17 |>
     inner_join(old_salary, by = "player_id")
 ```
 
-### 2017-2018 salaries
+
+### 2017~2018 - 2016~2017 salaries
 ```{r}
-new_salary <- salaries_record |> 
-  filter(season_start == 2017) |> 
-  rename( "new_salary" = salary) |> #new_name = old_name
-  select(player_id, new_salary)
+new_salary <- salaries_record %>%  
+  select(player_id, season_start, team, salary) %>% 
+  filter(season_start == "2017"| season_start == "2016") %>% 
+  spread(key = "season_start", value = "salary")
+
+
+NBAinfo <- performance16_17 %>% 
+    inner_join(new_salary, by = "player_id")
 ```
 
 ### data frame we will use to analyze
