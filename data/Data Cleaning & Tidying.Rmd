@@ -26,35 +26,31 @@ salaries_record <- read_csv("salaries_1985to2018.csv")
 
 ```{r}
 ## performance for 2016 to 2017
-old_salary <- salaries_record |>   
-  filter(season_start == 2016) |> 
+old_salary <- salaries_record %>%   
+  filter(season_start == 2016) %>% 
   rename("old_salary" = salary)
 
-NBAinfo <- performance16_17 |> 
+NBAinfo <- performance16_17 %>% 
     inner_join(old_salary, by = "player_id")
 ```
 
 ### 2017-2018 salaries
 ```{r}
-new_salary <- salaries_record |> 
-  filter(season_start == 2017) |> 
-  rename( "new_salary" = salary) |> #new_name = old_name
+new_salary <- salaries_record %>% 
+  filter(season_start == 2017) %>% 
+  rename( "new_salary" = salary) %>% #new_name = old_name
   select(player_id, new_salary)
 ```
 
 ### data frame we will use to analyze
 ```{r}
-NBA <- NBAinfo |> 
-  left_join(new_salary, by = "player_id") |> 
-  select(-league, -season_start, -season_end, -season, -team, -rk, -player_id) |> 
+NBA <- NBAinfo %>% 
+  left_join(new_salary, by = "player_id") %>% 
+  select(-league, -season_start, -season_end, -season, -team, -rk, -player_id) %>% 
     distinct(player, tm, .keep_all = TRUE) 
 
 colnames(NBA)
 #tm TOT means total, some players played for multiple teams
 ```
 
-
-```{r}
-model <- lm(new_salary ~ pos + age + g + gs + mp + fg + fga + `fg%` + 3p + 3pa + `3p%` + 2p + 2pa + `2p%`+`efg%`+ ft +fta+`ft%` + orb + drb + trb + ast + stl + blk + tov + pf + pts, data = NBA)
-```
-
+hellooooooo
