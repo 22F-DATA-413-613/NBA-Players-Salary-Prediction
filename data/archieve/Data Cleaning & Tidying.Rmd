@@ -11,9 +11,24 @@ library(broom)
 ```
 
 ```{r}
-
 # setwd(STAT615NBA/data)
 performance16_17 <- read_csv("player16_17.csv")
+
+performance16_17 %>% 
+  filter(Tm != "TOT") -> performance16_17
+```
+
+```{r}
+team_name <- read_csv("team_names.csv") 
+
+team_name%>% 
+  mutate(prefix_1 = str_to_upper(prefix_1)) -> team_name
+
+performance16_17 %>% 
+  left_join(team_name, by = c("Tm" = "prefix_1")) -> performance16_17
+```
+
+```{r}
 names(performance16_17)[1:31] <- tolower(names(performance16_17)[1:31])
 glimpse(performance16_17)
 ```
@@ -31,40 +46,38 @@ old_salary <- salaries_record %>%
   rename("old_salary" = salary)
 
 NBAinfo <- performance16_17 %>% 
-    inner_join(old_salary, by = "player_id")
+  left_join(old_salary, by = c("player_id" = "player_id", "name" = "team")) %>% 
+  drop_na()
+
+NBAinfo %>% 
+  dplyr::select(-season,-prefix_2,-league,-season_end,-season_start) -> NBAinfo
 ```
 
 
 ### 2017~2018 - 2016~2017 salaries
 ```{r}
-<<<<<<< HEAD
+
 new_salary <- salaries_record %>% 
   filter(season_start == 2017) %>% 
-  rename( "new_salary" = salary) %>% #new_name = old_name
-  select(player_id, new_salary)
-=======
-new_salary <- salaries_record %>%  
-  select(player_id, season_start, team, salary) %>% 
-  filter(season_start == "2017"| season_start == "2016") %>% 
-  spread(key = "season_start", value = "salary")
+  rename( "new_salary" = salary) #new_name = old_name
 
 
-NBAinfo <- performance16_17 %>% 
-    inner_join(new_salary, by = "player_id")
->>>>>>> 227f95417563b50dff119465a8618fd9b870188e
+NBAinfo <- NBAinfo %>% 
+    left_join(new_salary, by = c("player_id" = "player_id", "name" = "team"))
+
+  NBAinfo %>% 
+   dplyr::select(-league,-season_end,-season_start, -season) -> NBAinfo 
+  
+# write_csv(NBAinfo, "NBA.csv")
+  
 ```
 
 ### data frame we will use to analyze
 ```{r}
 NBA <- NBAinfo %>% 
-  left_join(new_salary, by = "player_id") %>% 
-  select(-league, -season_start, -season_end, -season, -team, -rk, -player_id) %>% 
-    distinct(player, tm, .keep_all = TRUE) 
+  semi_join(new_salary, by = "player_id")
 
 colnames(NBA)
 #tm TOT means total, some players played for multiple teams
 ```
 
-hellooooooo
-goodbyes
-fsdfjsdlfjsd
