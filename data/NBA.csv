@@ -1,4 +1,4 @@
-rk,player,player_id,pos,age,tm,g,gs,mp,fg,fga,fg%,3p,3pa,3p%,2p,2pa,2p%,efg%,ft,fta,ft%,orb,drb,trb,ast,stl,blk,tov,pf,pts,name,old_salary,new_salary
+rk,player,player_id,pos,age,tm,g,gs,mp,fg,fga,fg%,3p,3pa,3p%,2p,2pa,2p%,efg%,ft,fta,ft%,orb,drb,trb,ast,stl,blk,tov,pf,pts,name,16_17_salary,17_18salary
 1,Alex Abrines,abrinal01,SG,23,OKC,68,6,1055,134,341,0.393,94,247,0.381,40,94,0.426,0.531,44,49,0.898,18,68,86,40,37,8,33,114,406,Oklahoma City Thunder,5994764,5725000
 2,Quincy Acy,acyqu01,PF,26,DAL,6,0,48,5,17,0.294,1,7,0.143,4,10,0.4,0.324,2,3,0.667,2,6,8,0,0,0,2,9,13,Dallas Mavericks,1050961,NA
 2,Quincy Acy,acyqu01,PF,26,BRK,32,1,510,65,153,0.425,36,83,0.434,29,70,0.414,0.542,43,57,0.754,18,89,107,18,14,15,19,58,209,Brooklyn Nets,1914544,1709538

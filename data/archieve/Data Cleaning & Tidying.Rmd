@@ -43,7 +43,7 @@ salaries_record <- read_csv("salaries_1985to2018.csv")
 ## performance for 2016 to 2017
 old_salary <- salaries_record %>%   
   filter(season_start == 2016) %>% 
-  rename("old_salary" = salary)
+  rename("16_17_salary" = salary)
 
 NBAinfo <- performance16_17 %>% 
   left_join(old_salary, by = c("player_id" = "player_id", "name" = "team")) %>% 
@@ -59,7 +59,7 @@ NBAinfo %>%
 
 new_salary <- salaries_record %>% 
   filter(season_start == 2017) %>% 
-  rename( "new_salary" = salary) #new_name = old_name
+  rename("17_18salary" = salary) #new_name = old_name
 
 
 NBAinfo <- NBAinfo %>% 
@@ -68,7 +68,7 @@ NBAinfo <- NBAinfo %>%
   NBAinfo %>% 
    dplyr::select(-league,-season_end,-season_start, -season) -> NBAinfo 
   
-# write_csv(NBAinfo, "NBA.csv")
+write_csv(NBAinfo, "NBA.csv")
   
 ```
 
