@@ -8,18 +8,27 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(broom)
+library(GGally)
+library(lbutils)
+library(olsrr)
 ```
 
 ```{r}
 NBA <- read_csv("data/NBA.csv")
 colnames(NBA)
-
-salarymodel <- NBA %>% 
-  select(-rk, -player, -player_id, -`17_18salary`, -name, -tm, -`fg`, -`fga`, -`3p`, -`3pa`, -`2p`, -`2pa`, -pos, -ft, -fta, -g, -gs)
 ```
+
+
+```{r}
+# mp, efg%, orb, drb, pf snd age
+# FG% 3P, 3P%, 2P, 2P%, FT%, TRB, AST, STL, BLK, TOV, PTS？
+salarymodel <- NBA %>% 
+  select(-rk, -player, -player_id, -`17_18salary`, -name, -tm, -`fg`, -`fga`, -`3pa`, -`2pa`, -pos, -ft, -fta, -g, -gs, -`efg%`, -mp, -orb, - drb, -pf, -age)
+glimpse(salarymodel)
+```
+
 Data exploratory analysis
 ```{r}
-library(GGally)
 salarymodel %>%
     ggpairs()
 ```
@@ -29,22 +38,18 @@ lmmodel <- lm(`16_17_salary` ~ ., data = salarymodel)
 mult_sal <- tidy(lmmodel)
 mult_sal
 ```
+
 ```{r}
 g_mult_sal <- broom::glance(lmmodel)
 g_mult_sal
 ```
+
 ```{r}
-library(lbutils)
 full_anova <- lb_anovat_lm(lmmodel, reg_collapse = TRUE)
 full_anova
 
 ```
 
-```{r}
-library(GGally)
-salarymodel %>%
-    ggpairs()
-```
 
 ```{r}
 qplot(data = salarymodel, x = `16_17_salary`, geom = "histogram", main = "Distribution of 2016-2017 Salary", bins = 20, color = I("black"), fill = I("blue"))
@@ -57,65 +62,138 @@ qplot(data = salarymodel, y = `16_17_salary`, geom = "boxplot", main = "Distribu
 
 ```{r}
 salarymodel %>%
-  mutate(lnsalary = log(`16_17_salary`)) -> salarymodel
+  mutate(lnsalary = log(`16_17_salary`)) -> salarymodel2
 
-qplot(data = salarymodel, x = lnsalary, geom = "histogram", bins = 20, color = I("black"), fill = I("blue"), main = "Distribution of ln(2016-2017 Salary)")
+qplot(data = salarymodel2, x = lnsalary, geom = "histogram", bins = 20, color = I("black"), fill = I("blue"), main = "Distribution of ln(2016-2017 Salary)")
 ```
 ```{r}
-qplot(data = salarymodel, y = lnwages, geom = "boxplot", main = "Distribution of ln(salary)")
+qplot(data = salarymodel2, y = lnsalary, geom = "boxplot", main = "Distribution of ln(salary)")
 
 ```
 
 ```{r}
-ggplot(data = salarymodel, aes(sample = lnsalary)) +
+ggplot(data = salarymodel2, aes(sample = lnsalary)) +
   stat_qq() +
   stat_qq_line(color = I("blue"))
 ```
 
 ```{r}
-simpleage <- lm(data = salarymodel, lnsalary ~ age)
-tidy(simpleage)
+salarymodel2 %>% 
+  select(-`16_17_salary`) -> salarymodel2
+
+newmodel <- lm(lnsalary ~ ., data = salarymodel2)
+newmodel_t <- tidy(newmodel)
+newmodel_t
+```
+ 
+  * Fitted model:  $\widehat{salary} = 13.02 -1.023 \cdot trans.team + 5.82 \cdot fg \% + 0.0094 \cdot 3p + 0.25 \cdot 3p \% + 0.0034 \cdot 2p - 4.18 \cdot 2p \% + 0.394 \cdot ft \% + 0.0023 \cdot trb +0.0015 \cdot ast + 0.00037 \cdot stl -0.0043 \cdot blk + -0.0025 \cdot tov - 0.00078 \cdot pts$
+```{r}
+newmodel_g <- broom::glance(newmodel)
+newmodel_g
 ```
 
 ```{r}
-glance(simpleage)
+newmodel_anova <- lb_anovat_lm(newmodel, reg_collapse = TRUE)
+newmodel_anova
 
 ```
 
 ```{r}
-res_age <- augment(simpleage)
+tidy(newmodel, conf.int = "TRUE", conf.level = 0.98)
+
+```
+### Method 1: All Subset Models
+
+```{r}
+all_subsets_model <- ols_step_all_possible(newmodel)
+all_subsets_model
 ```
 
 ```{r}
-ggplot(data = salarymodel, aes(x = age, y = lnsalary)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-```{r}
-qplot(data = res_age, x = .fitted, y = .resid, geom = "point", main = "Residuals vs Fitted Values for Regressing lnsalary on age")
+plot(all_subsets_model)
 ```
 
+### Method 2: The Best Subset Selection Method
 ```{r}
-salarymodel %>%
-  mutate(agesq = age*age) ->
-  salarymodel
-
-quadmod <- lm(lnsalary ~ age + agesq, data = salarymodel)
-tidy(quadmod)
+best_subset <- ols_step_best_subset(newmodel)
+best_subset
 ```
 
 ```{r}
-glance(quadmod)
+plot(best_subset)
+
+```
+
+## Stepwise Regression Techniques to Select the Best Model
+
+### Forward Selection Procedures
+
+```{r}
+step_for_model_def <- ols_step_forward_p(newmodel, details = TRUE, progress = TRUE)  #Default p-value 
+
 ```
 
 ```{r}
-res_quadmod <- augment(quadmod, data = salarymodel)
+step_for_model_def <- ols_step_forward_p(newmodel, details = TRUE, progress = TRUE)  #Default p-value 
+
 ```
 
 ```{r}
-ggplot(data = res_quadmod) +
-  geom_point(aes(x = age, y = lnsalary)) +
-  geom_line(aes(x =age, y = .fitted, color = I("blue")))
+step_for_model_def
 
+```
+
+```{r}
+plot(step_for_model_def)
+
+```
+
+
+```{r}
+step_for_model_p15 <- ols_step_forward_p(newmodel, pent = 0.15)
+step_for_model_p15
+```
+```{r}
+plot(step_for_model_p15)
+
+```
+
+### backward
+
+```{r}
+step_back_mod <- ols_step_backward_p(newmodel)
+step_back_mod
+```
+
+```{r}
+plot(step_back_mod)
+
+```
+
+## step both
+
+
+### step both
+```{r}
+
+step_model <- ols_step_both_p(newmodel)
+step_model
+```
+
+```{r}
+plot(step_model)
+
+```
+```
+
+
+
+## When we want to do prediction
+```{r}
+# newobs <- data.frame(bedrms = 4, baths = 2, size = 2000, yard = 7500, age = 45, nbhd = 2)
+# predict(multmodprice, newdata = newobs, interval = "confidence", level = 0.95)
+
+# newobs <- data.frame(bedrms = 4, baths = 2, size = 2000, yard = 7500, age = 45, nbhd = 2)
+# predict(multmodprice, newdata = newobs, interval = "prediction", level = 0.95)
 ```
 
