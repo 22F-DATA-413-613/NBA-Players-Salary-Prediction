@@ -1,0 +1,343 @@
+---
+title: "Analysis"
+author: "Yuka, Adela, Jack"
+date: "`r Sys.Date()`"
+output: html_document
+---
+## loading library
+```{r}
+library(tidyverse)
+library(broom)
+library(GGally)
+library(lbutils)
+library(olsrr)
+library(fastDummies)
+library(lattice)
+library(ggfortify)
+library(car)
+
+```
+
+```{r}
+NBA <- read_csv("NBA.csv")
+colnames(NBA)
+```
+
+```{r}
+salarymodel <- NBA %>% 
+  select(-rk, -player, -player_id, -`17_18salary`, -name, -tm, -`fg`, -`fga`, -`3pa`, -`2pa`, -ft, -fta, -g, -gs, -`efg%`, -mp, -orb, - drb, -pf, -age)
+
+glimpse(salarymodel)
+```
+
+Data exploratory analysis
+```{r}
+salarymodel %>%
+    ggpairs()
+```
+
+```{r}
+lmmodel <- lm(`16_17_salary` ~ ., data = salarymodel)
+mult_sal <- tidy(lmmodel)
+mult_sal
+```
+
+```{r}
+g_mult_sal <- broom::glance(lmmodel)
+g_mult_sal
+```
+
+```{r}
+full_anova <- lb_anovat_lm(lmmodel, reg_collapse = TRUE)
+full_anova
+
+```
+
+
+```{r}
+qplot(data = salarymodel, x = `16_17_salary`, geom = "histogram", main = "Distribution of 2016-2017 Salary", bins = 20, color = I("black"), fill = I("blue"))
+```
+
+```{r}
+qplot(data = salarymodel, y = `16_17_salary`, geom = "boxplot", main = "Distribution of 2016-2017 Salary")
+
+```
+
+```{r}
+salarymodel %>%
+  mutate(lnsalary = log(`16_17_salary`)) -> salarymodel
+```
+
+
+```{r}
+qplot(data = salarymodel2, x = lnsalary, geom = "histogram", bins = 20, color = I("black"), fill = I("blue"), main = "Distribution of ln(2016-2017 Salary)")
+```
+
+```{r}
+vif(salarymodel2)
+```
+
+```{r}
+qplot(data = salarymodel2, y = lnsalary, geom = "boxplot", main = "Distribution of ln(salary)")
+
+```
+
+```{r}
+ggplot(data = salarymodel2, aes(sample = lnsalary)) +
+  stat_qq() +
+  stat_qq_line(color = I("blue"))
+```
+
+## full model
+```{r}
+salarymodel %>% 
+  select(-`16_17_salary`, -pos , -trans_team) -> salarymodel2
+
+newmodel <- lm(lnsalary ~ ., data = salarymodel2)
+newmodel_t <- tidy(newmodel) 
+newmodel_t 
+```
+```{r}
+vif(newmodel)
+```
+ 
+  * Fitted model:  $\widehat{salary} = 13.02 -1.023 \cdot trans.team + 5.82 \cdot fg \% + 0.0094 \cdot 3p + 0.25 \cdot 3p \% + 0.0034 \cdot 2p - 4.18 \cdot 2p \% + 0.394 \cdot ft \% + 0.0023 \cdot trb +0.0015 \cdot ast + 0.00037 \cdot stl -0.0043 \cdot blk + -0.0025 \cdot tov - 0.00078 \cdot pts$
+  
+```{r}
+newmodel_g <- broom::glance(newmodel)
+newmodel_g
+```
+
+```{r}
+newmodel_anova <- lb_anovat_lm(newmodel, reg_collapse = FALSE)
+newmodel_anova
+
+```
+
+```{r}
+tidy(newmodel, conf.int = "TRUE", conf.level = 0.98)
+
+```
+## Reuced Model based on subset thing
+```{r}
+
+reduce <- NBA %>% 
+  mutate(lnsalary = log(`16_17_salary`)) %>% 
+  select(lnsalary,`fg%`,`3p`,`3p%`,`2p%`,trb,blk, pos, trans_team)
+
+reducemodel <- lm(lnsalary ~`fg%` + `3p` + `3p%`+ `2p%`+ trb + blk, data = salarymodel2)
+
+reduce_model_t <- tidy(reducemodel) 
+reduce_model_t
+
+reduce_model_g <- broom::glance(reducemodel)
+reduce_model_g
+
+reduce_model_a <- lb_anovat_lm(reducemodel, reg_collapse = FALSE)
+reduce_model_a
+
+tidy(reducemodel, conf.int = "TRUE", conf.level = 0.98)
+
+vif(reducemodel)
+
+
+```
+
+
+```{r}
+# dummy vaiable
+salarymodel %>%
+  mutate(lnsalary = log(`16_17_salary`)) %>% 
+  select(-'16_17_salary')-> 
+  dummy
+```
+
+
+```{r}
+results <- dummy_cols(.data = reduce, select_columns = c("pos","trans_team"))
+
+results %>%
+  select(pos, pos_C, pos_PF, pos_PG, pos_SF, pos_SG, trans_team, trans_team_none, trans_team_trans) %>%
+  head(6)
+
+newresult <- dummy_cols(.data = reduce, select_columns = c("pos","trans_team"), remove_selected_columns = TRUE)
+
+rename(.data = newresult, trans = trans_team_trans) -> newdummy
+
+dummy_model <- lm(lnsalary ~ ., data = newdummy)
+
+dumtidyout <- tidy(dummy_model)
+dumglout <- glance(dummy_model)
+dumtidyout
+dumglout
+```
+
+# Comparing models
+
+```{r}
+dumglout #dummy models
+```
+
+```{r}
+newmodel_g #full model wihtout dummy
+```
+
+* For the full model including the dummy variables $R^2_{adj}$ = 0.4492.
+
+* For the full model without the dummy variables $R^2_{adj}$ = 0.4096
+
+### Method 1: All Subset Models
+
+```{r}
+all_subsets_model <- ols_step_all_possible(newmodel)
+all_subsets_model
+
+all_subsets_model %>% 
+  mutate(bestcp = cp - n) %>% 
+  arrange(bestcp)-> x
+
+```
+
+```{r}
+plot(all_subsets_model)
+```
+
+### Method 2: The Best Subset Selection Method
+```{r}
+best_subset <- ols_step_best_subset(newmodel)
+best_subset
+```
+
+```{r}
+plot(best_subset)
+
+```
+
+## Stepwise Regression Techniques to Select the Best Model
+
+### Forward Selection Procedures
+
+```{r}
+step_for_model_def <- ols_step_forward_p(newmodel, details = TRUE, progress = TRUE)  #Default p-value 
+
+```
+
+```{r}
+step_for_model_def <- ols_step_forward_p(newmodel, details = TRUE, progress = TRUE)  #Default p-value 
+
+```
+
+```{r}
+step_for_model_def
+
+```
+
+```{r}
+plot(step_for_model_def)
+
+```
+
+
+```{r}
+step_for_model_p15 <- ols_step_forward_p(newmodel, pent = 0.15)
+step_for_model_p15
+```
+```{r}
+plot(step_for_model_p15)
+
+```
+
+### backward
+
+```{r}
+step_back_mod <- ols_step_backward_p(newmodel)
+step_back_mod
+```
+
+```{r}
+plot(step_back_mod)
+
+```
+
+## step both
+### step both
+```{r}
+
+step_model <- ols_step_both_p(newmodel)
+step_model
+```
+
+```{r}
+plot(step_model)
+
+```
+
+
+
+
+### When we want to do prediction
+
+```{r}
+test <- read_csv("player17_18.csv")
+names(test)[1:31] <- tolower(names(test)[1:31])
+
+test_result <- dummy_cols(.data = test, select_columns = c("pos","trans_team"), remove_selected_columns = TRUE)
+rename(.data = test_result, trans = trans_team_trans) -> test_dummy
+
+# final reduce model
+full_predict <- predict(dummy_model, newdata = test_dummy, interval = "confidence", level = 0.95)
+full_predict <- cbind(test_dummy, full_predict)
+
+full_predict1 <- full_predict %>% 
+  left_join(NBA, by = c("player_id" = "player_id", "tm" = "tm")) %>% 
+  select(fit, `17_18salary`)
+  
+diff <- log(full_predict1$`17_18salary`)-full_predict1$fit
+
+MAD <- mean(abs(diff),na.rm = TRUE)
+MSE <- mean(diff^2,na.rm = TRUE)
+
+
+
+```
+
+# model testing
+```{r}
+# Assumtion
+autoplot(dummy_model)
+
+# Residual normality test
+shapiro.test(dummy_model$residuals)
+
+# Residual independence test
+durbinWatsonTest(dummy_model)
+
+# Residual variance homogeneity test
+ncvTest(dummy_model)
+```
+
+```{r}
+
+refit <- lm(abs(residuals(dummy_model))~fitted(dummy_model))
+refit
+
+wts <- 1 / fitted(refit)^2
+wts
+
+lm_wls <- lm(lnsalary ~ ., data = newdummy, weights = wts)
+summary(lm_wls)
+
+plot(refit)
+autoplot(lm_wls)
+ncvTest(lm_wls)
+
+
+# Residual normality test
+# shapiro.test(lm_wls$residuals)
+
+# Residual independence test
+durbinWatsonTest(lm_wls)
+
+
+```
+
