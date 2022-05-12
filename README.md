@@ -1,5 +1,5 @@
 # STAT615NBA
-American University 2022 Fall Semester STAT615 Regression Group Project
+American University 2022 Spring Semester STAT615 Regression Group Project
 
 The project is to find the most influential factors that can determine a NBA players expected contract salary. 
 
