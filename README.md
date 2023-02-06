@@ -9,12 +9,12 @@ For further details please view 615-final-group-project-ppt.
 
 
 
-Authers: 
+##Authers: 
 
 
 
 
-### Youjia Chen <br />
+#### Youjia Chen <br />
 
 [![EmailYC](https://custom-icon-badges.demolab.com/badge/-Email%20Yuka-teal?style=for-the-badge&logo=mail&logoColor=white)](mailto:yjchen9596@gmail.com?subject=Contact%20from%20GitHub&body=Hi%20Yuka,%0A%0AI%20am%20reaching%20out%20because%20.%20.%20.)
 
