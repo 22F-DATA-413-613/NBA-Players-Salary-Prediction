@@ -18,7 +18,6 @@ Authers:
 
 [![EmailYC](https://custom-icon-badges.demolab.com/badge/-Email%20Yuka-teal?style=for-the-badge&logo=mail&logoColor=white)](mailto:yjchen9596@gmail.com?subject=Contact%20from%20GitHub&body=Hi%20Yuka,%0A%0AI%20am%20reaching%20out%20because%20.%20.%20.)
 
-
 [![GitHubYC](https://custom-icon-badges.demolab.com/badge/-Yuka's%20GitHub-purple?style=for-the-badge&logo=mark-github&logoColor=white)](mailto:yjchen9596@gmail.com?subject=Contact%20from%20GitHub&body=Hi%20Yuka,%0A%0AI%20am%20reaching%20out%20because%20.%20.%20.)
 
 - Adela Yang <br />
