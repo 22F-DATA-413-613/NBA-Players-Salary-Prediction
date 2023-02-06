@@ -5,10 +5,8 @@ American University 2022 Spring Semester STAT615 Regression Group Project
 
 • Deployed 3 different regression models and the best model has 43% of the variability observed in the target variable seasonal salary is explained with R (broom, lbutils, fastDummies, car, lattice).
 
-The project is to find the most influential factors that can determine a NBA players expected contract salary. 
-
-The final model was compared with two other different multiple regression models. 
-
+The project is to find the most influential factors that can determine a NBA players expected contract salary. <br />
+The final model was compared with two other different multiple regression models. <br />
 For further details please view 615-final-group-project-ppt. 
 
 
