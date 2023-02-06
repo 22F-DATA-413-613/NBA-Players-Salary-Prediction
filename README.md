@@ -26,6 +26,6 @@ Adela Yang <br />
 [![GitHubAY](https://custom-icon-badges.demolab.com/badge/-Adela's%20GitHub-purple?style=for-the-badge&logo=mark-github&logoColor=white)](https://github.com/adelayang1997)
 
 Jacque Lo <br />
-[![EmailJL](https://custom-icon-badges.demolab.com/badge/-Email%20Yuka-teal?style=for-the-badge&logo=mail&logoColor=white)](mailto:cl0938a@student.american.edu?subject=Contact%20from%20GitHub&body=Hi%20Jacque,%0A%0AI%20am%20reaching%20out%20because%20.%20.%20.)
+[![EmailJL](https://custom-icon-badges.demolab.com/badge/-Email%20Jacque-teal?style=for-the-badge&logo=mail&logoColor=white)](mailto:cl0938a@student.american.edu?subject=Contact%20from%20GitHub&body=Hi%20Jacque,%0A%0AI%20am%20reaching%20out%20because%20.%20.%20.)
 
 [![GitHubAY](https://custom-icon-badges.demolab.com/badge/-Jacque's%20GitHub-purple?style=for-the-badge&logo=mark-github&logoColor=white)](https://github.com/chunyulo0214)
