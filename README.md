@@ -15,10 +15,11 @@ Authers:
 
 
 - Youjia Chen <br />
+
 [![EmailYC](https://custom-icon-badges.demolab.com/badge/-Email%20Yuka-teal?style=for-the-badge&logo=mail&logoColor=white)](mailto:yjchen9596@gmail.com?subject=Contact%20from%20GitHub&body=Hi%20Yuka,%0A%0AI%20am%20reaching%20out%20because%20.%20.%20.)
 
-[![GitHubYC](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=GitHub%20Page&logoColor=white
-)](https://github.com/yjchen9596)
+
+[![GitHubYC](https://custom-icon-badges.demolab.com/badge/-mark-github%20Yuka-teal?style=for-the-badge&logo=mail&logoColor=white)](mailto:yjchen9596@gmail.com?subject=Contact%20from%20GitHub&body=Hi%20Yuka,%0A%0AI%20am%20reaching%20out%20because%20.%20.%20.)
 
 - Adela Yang <br />
 [![EmailAY](https://custom-icon-badges.demolab.com/badge/-Email%20Adela-teal?style=for-the-badge&logo=mail&logoColor=white)](mailto:cy3491a@student.american.edu?subject=Contact%20from%20GitHub%20about%20ShinyApp&body=Hi%20Adela,%0A%0AI%20am%20reaching%20out%20because%20.%20.%20.)
