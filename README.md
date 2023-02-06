@@ -1,6 +1,9 @@
 # STAT615NBA
 American University 2022 Spring Semester STAT615 Regression Group Project
 
+• Joined 3 NBA players salary and performance datasets from Basketball-Reference.com; selected 20 variables of interests for multiple regression analysis by Excel.
+• Deployed 3 different regression models and the best model has 43% of the variability observed in the target variable seasonal salary is explained with R (broom, lbutils, fastDummies, car, lattice).
+
 The project is to find the most influential factors that can determine a NBA players expected contract salary. 
 
 The final model was compared with two other different multiple regression models. 
